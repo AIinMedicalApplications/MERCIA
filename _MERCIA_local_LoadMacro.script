@@ -1,0 +1,214 @@
+//----------------------------------------------------------------------------------
+//! Macro module _MERCIA_local_LoadMacro
+/*!
+// \file    _MERCIA_local_LoadMacro.script
+// \author  saalfeldlab@gmail.com
+// \date    2015-07-17
+//
+// _MERCIA_local_ framework
+*/
+//----------------------------------------------------------------------------------
+
+
+
+Interface {
+  Inputs {}
+  Outputs {
+    Field image0{
+      internalName = Bypass.output0
+    }
+  }
+  Parameters {
+    
+    Field Load{internalName = ImageLoad.filename}
+    Field LoadDirectDicom{internalName = DirectDicomImport.source}
+    
+    Field SwitchForInput{internalName = Switch.currentInput}
+    Field SwitchForTZDim{internalName = Switch1.currentInput}
+    
+    Field sizeX { internalName = Info.sizeX}
+    Field sizeY {internalName = Info.sizeY}
+    Field sizeZ {internalName = Info.sizeZ}
+    Field sizeT {internalName = Info.sizeT}
+    
+    Field InputChoiceInteger{
+      type       = Integer 
+      value      = 0
+    }
+    Field StackImport{internalName = DirectDicomImport.dplImport}
+  }
+}
+
+
+Commands {
+  source = $(LOCAL)/_MERCIA_local_LoadMacro.py
+}
+
+Window{
+  // 180 + 840
+  TabView{
+    
+    name = "ImportDataTabView"
+    mode = invisible
+    
+    width = 1020
+    height = 1000
+    expandX = Yes
+    expandY = Yes
+
+    
+    TabViewItem "ImportData"{
+      alignY = Top
+      expandY = 1
+
+      
+
+      Vertical{
+        Label{title = "1. Load DICOM Data " style{titleFont {size = 16 }  }}
+
+        Label{title = ""}
+        Button {
+          name    = AnonymData
+          title   = "Optional: Export Anonymized DICOM Data"
+          command = SelectTab1Function
+          style{colors{button = lightgreen} titleFont {weight=Bold}}
+          expandX = 1
+        }
+        Label{title = ""}
+        alignY = Top
+        
+        Horizontal{        
+          SpacerX {width = 5 expandX = 0}
+          Vertical{
+            Box "(Optional: Import image stack into single dataset)"{
+              Button {
+                name    = importButton
+                title   = "Import..."
+                command = ImportDialog
+              }
+            }
+            Label {title = ""}
+
+            Box "Load Input Image"{
+              Vertical{
+                
+                Label {title = "Select type of image: single image (left) or stack of images, i.e., directory (right)"}
+
+                RadioButtonGroup SwitchForInput {
+                  orientation = Horizontal
+                  expandX = 1
+                  name        = InputChoiceIntegerRadioButtonGroup
+                  items {
+                    item 0 { title="Single Image"}
+                    item 1 { title="Image Stack"}
+                  }
+                }
+              }
+              Horizontal{
+                Vertical{
+                  //Label{title = "Select DICOM dataset (single file)" style {colors{bg = whitesmoke}} expandX = 1}
+                  Horizontal{
+                   Label{title = "Select DICOM dataset (single file):"}
+                    Field Load{
+                      title        = ""
+                      browseButton = ON
+                      browseMode   = open
+                    }
+                  }
+                }
+                Label{title="    "}
+                Vertical{
+                  // or use DirectDicomImport
+                  
+                  Horizontal{
+                    Label{title = "Select *clinical* DICOM dataset (many files):" }
+                    Field LoadDirectDicom{
+                      title        = "Load DICOM stack"
+                      browseButton = ON
+                      browseMode   = directory
+                    }
+                    Button StackImport{
+                      title = "Import"
+                    }
+                  }
+                }
+              }
+            }
+            // End of Box Load Input Image
+            
+            Box Dimensions{
+              Horizontal{ Field sizeX{title = "x Dim:"} Field sizeY{title = "y Dim:"} Field sizeZ{title = "z Dim:"} Field sizeT{title = "t Dim:"} alignX = left expandX = False}
+              
+             
+              Vertical{
+                
+                Label {title = "Apply swap flip of t and z dimension if necessary"}
+
+                RadioButtonGroup  SwitchForTZDim {
+                  orientation = Horizontal
+                  expandX     = 1
+                  name        = InputChoiceIntegerRadioButtonGroup2
+                  items {
+                    item 0 { title="Keep it"}
+                    item 1 { title="Swap flip t & z"}
+                  }
+                }
+              }
+            }
+            
+            Viewer View2D.self{
+              type = SoRenderArea     
+              width = 600
+              height = 600
+            }
+          }
+        }    
+      }
+      //SpacerY {height = 20}
+
+      
+    }
+    TabViewItem "Anonymize"{
+      Label{title = "Optional: Anonymize Data" style{titleFont {size = 16 }  }}
+      Label{title = ""}
+      Panel{
+        module = AnonymizeMacro1
+      }
+      /*
+      Horizontal{
+        Field AnonymizeMacro1.changePatientsName{}
+        Field AnonymizeMacro1.patientsName{}
+      }
+      Horizontal{
+        Field AnonymizeMacro1.changeSeriesDescription{}
+        Field AnonymizeMacro1.seriesDescription{}
+      }
+      Horizontal{
+        Field AnonymizeMacro1.changePatientsBirthDate{}
+        Field AnonymizeMacro1.patientsBirthDate{}
+      }
+      Horizontal{
+        Field AnonymizeMacro1.changePatientID{}
+        Field AnonymizeMacro1.patientID{}
+      }
+      */
+      Label{title = ""}
+      Label{title = "Preview"}
+      Viewer View2D1.self{
+        type = SoRenderArea
+        width = 600
+        height = 600
+      }
+
+              
+      Button {
+        name    = selectTab1b
+        title   = "Go Back"
+        command = SelectTab0Function
+        style{colors{button = lightsalmon}}
+        expandX = 1
+      }
+    }
+    SpacerX {width = 20 expandX = 0}
+  }
+}

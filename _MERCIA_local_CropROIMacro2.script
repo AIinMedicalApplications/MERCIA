@@ -1,0 +1,238 @@
+//----------------------------------------------------------------------------------
+//! Macro module _MERCIA_local_CropROIMacro2
+/*!
+// \file    _MERCIA_local_CropROIMacro2.script
+// \author  glasser
+// \date    2015-07-18
+//
+// MERICA framework
+*/
+//----------------------------------------------------------------------------------
+
+
+
+Interface {
+  Inputs {
+    Field imageIn0{
+      internalName = Bypass.input0
+    }
+  }
+  Outputs {
+    Field meshOut0{
+      internalName = BaseBypass.baseOut0
+    }
+  }
+  Parameters {
+    
+    Field LutCenter{internalName = View3D3.greyCenter}
+    Field LutWidth{internalName = View3D3.greyWidth}
+    Field IsoMinValue{internalName = WEMIsoSurface1.isoMinValue}
+    Field ExtractMesh{internalName = WEMIsoSurface1.startTask}
+    Field WEMpatchListString{internalName = WEMDemergePatches.patchListString}
+    Field ThreshWEMSmallerParts{internalName = WEMDemergePatches.limit}
+    Field FiletypeWEM{internalName = WEMSave2.fileType}
+    Field SaveWEM{internalName = WEMSave2.filename}
+    
+    Field ResetContours{internalName = SoView2DContour.triggerRemoveAll}
+    Field ResetCenterFromContours{
+      type = Trigger
+    }
+    Field AddContour{internalName = SoView2DContour.triggerAddContour}
+    
+    Field WEMCellsize{internalName = WEMIsoSurface1.voxelSampling}
+    Field WEMApply{internalName = WEMIsoSurface1.startTask}
+    //Field ResetROIs{internalName = ROISelect.resetAll}
+    
+    Field WEMDemergePatchAutoApply1{internalName = WEMDemergePatches.autoApply}
+    Field WEMDemergePatchAutoApply2{internalName = WEMDemergePatches.updateMode}
+    Field WEMDemergePatchAutoApply3{internalName = WEMDemergePatches.apply}
+  }
+}
+
+
+Commands {
+  source = $(LOCAL)/_MERCIA_local_CropROIMacro2.py
+  initCommand = "*py: init(ctx) *"  
+}
+
+Description{
+  Field LutCenter  { min = 0 max = 1 }
+  Field LutWidth   { min = 0 max = 1 }
+}
+
+Window{
+  // 180 + 840
+    
+   
+      width  = 1020
+      height = 1000
+
+    
+      TabView{
+        
+        alignY  = Top
+        expandY = 1
+        
+        name = "TabViewFor_MERCIA_local_CropROIMacro"
+        mode = invisible
+
+        // --- FIRST TABVIEW ITEM --------------------------------------------------
+        TabViewItem "Check 3D"{
+          Label{title = "2. Extract Initial Mesh " style{titleFont {size = 16 }  }}
+          Label{title = "2.1 Define Center and Width for Thresholding" style{titleFont {size = 14 }  }}
+          Label{title = ""}
+          expandY = 1
+          Viewer View3D3.self{width =500 height = 650 clone = yes}
+          Grid{
+            Field LutCenter {
+              x = 0
+              y = 0
+              step   = 0.05
+              title  = Center
+              slider = yes
+            }
+            Field LutWidth {
+              x = 0
+              y = 1
+              step   = 0.05
+              title  = Width
+              slider = yes
+            }
+            Vertical{
+              x     = 1 y= 1
+              Label{
+                
+                title = "    Hint: Try to set value < 0.05" 
+                style {titleFont {italic = Yes} }
+              } 
+              Label{
+                title = "    Hint: Zoom = STRG + LMB" 
+                style {titleFont {italic = Yes} }
+              }
+            }
+          }
+          Horizontal{
+            alignY  = Bottom
+            expandX = 1
+            Button {
+              name  = finishROI
+              title = "Build Initial Mesh"
+              command = SelectTab2Function
+              style{colors{button = lightgreen}}
+              expandX = 1
+            }
+          }          
+        }
+        // --- SECOND TABVIEW ITEM --------------------------------------------------
+        TabViewItem "Build WEM"{
+          Label{title = "2. Extract Initial Mesh " style{titleFont {size = 16 }  }}
+          Label{title = "2.2 Extract Mesh" style{titleFont {size = 14 }  }}
+          Label{title = ""}
+          
+          expandY = 0
+          Grid{
+            expandY = 1
+            Vertical{
+              expandY = 1
+              alignY = Top
+              width = 180
+              x=0 y=0
+              
+              Label{title="2.2.1 Mesh Parameters"  style{titleFont {weight=Bold }  }}
+              Horizontal{
+                Field IsoMinValue{ title="Iso value:"}
+                Label{title = " (based on Center/Width)" 
+                style {titleFont {italic = Yes} }
+                }
+              }
+              Field WEMCellsize{}
+              Button WEMApply{
+                title = "Step 1: Extract Mesh"   
+                style{ titleFont {weight=Bold}}
+              }
+              Horizontal{
+               /* Button InitializeMesh{
+                  title = "Initialize Mesh"
+                  command = initializeMesh
+                }
+                */
+                
+              }
+              Button ExtractMesh{
+                title= "Optional: extract mesh (use isovalue)"
+              }
+              Label{title = " ...only necessary when Iso-Value was directly entered" 
+                style {titleFont {italic = Yes} }  
+              }
+              
+              Label{title = ""}
+              Label{title="2.2.2 Remove small parts"  style{titleFont {weight=Bold }  }}
+              
+              Field ThreshWEMSmallerParts{title ="min. %"}
+              ListView WEMpatchListString {
+                visibleRows   = 9
+                selectionMode = NoSelection
+              }
+              //Field WEMDemergePatchAutoApply1{}
+              //Field WEMDemergePatchAutoApply2{}
+              Button WEMDemergePatchAutoApply3{
+                title = "Step 2: Apply Patch Size"
+                style{ titleFont {weight=Bold}}
+              }
+            }
+            
+            Vertical{
+              x= 1 y= 0
+              Label{title ="Show 3D Model"}
+              Viewer SoExaminerViewer.self{
+                height = 450
+                minimumHeight = 400
+                clone = Yes 
+              }               
+              
+            }
+            Vertical{
+              x=0 x2 = 1 y= 1
+              Label{title = ""}
+              Label{title="2.2.3 Save Mesh"  style{titleFont {weight=Bold }  }}
+              
+            }
+            
+            Vertical{
+              x = 0 y= 2
+              Field FiletypeWEM{
+                title = "Select file type"
+              }
+              Field SaveWEM {
+                title        = "Save mesh to "
+                browseButton = ON
+                browseMode   = save
+              }
+            }
+            Horizontal {
+              x = 0 x2 = 1 y=3
+              
+
+
+              
+              
+              Button {
+                name    = finishROIb
+                title   = "Step 3: Save Mesh"
+                command = saveInitialMesh
+                style{colors{button = lightgreen} titleFont {weight=Bold}}
+                expandX = 1
+              }
+              
+              Button {
+                name    = selectTab1b
+                title   = "Reset Threshold Values"
+                command = SelectTab1Function
+                style{colors{button = lightsalmon}}
+                expandX = 1
+              }
+            }             
+          }          
+        }
+      }     
+}
