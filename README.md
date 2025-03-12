@@ -20,14 +20,13 @@ Please cite our paper (see bottom)
   * left and right -> change width of windowing
   * ctrl + moving of pressed mouse wheel -> zoom in and out
   * shift + moving pressed mouse wheel -> pan / translate
-  * include small vessels but avoid surrounding tissue (see example pics): ![grafik](https://github.com/user-attachments/assets/2ffd4c19-4eb7-4784-95c9-529407a6d10e)
-    ![grafik](https://github.com/user-attachments/assets/774bb817-2ab3-402e-9267-e605ec3aab9a) 
+  * include small vessels but avoid surrounding tissue (see example): ![grafik](https://github.com/user-attachments/assets/53fad388-8808-4fa2-a07f-1e72d82ae8a2)
+ 
   * once you are satisfied, set parameter for width to 0.05 or smaller in order to produce a binary segmentation: ![grafik](https://github.com/user-attachments/assets/1227bc25-0acf-4e04-bb4a-e37483e54b91)
   * select "build initial mesh" (mesh extraction take a few seconds)
  
 #### Check Result
-* sometimes the view is not centered, fix it by pressing "View All" (1)
-* ![grafik](https://github.com/user-attachments/assets/bd05ff5c-1bb3-4547-bcd2-8225f4ef537d)
+* sometimes the view is not centered, fix it by pressing "View All" (1): ![grafik](https://github.com/user-attachments/assets/31c01ec0-70f7-46bd-9a53-a8cfe64ba45b)
 * You can remove smaller, unconnected parts of the mesh, a "+" and a "-" indicates whether the parts are contained or not: ![grafik](https://github.com/user-attachments/assets/b1be3678-c398-4663-843a-d3c66ad887f6)
 * You can save the mesh as *.obj file now
 
